@@ -1,1 +1,593 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nothing to Keep — Théophanie Parker</title>
+
+<style>
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #171717;
+  background: #fff;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; }
+
+button, input, textarea { font: inherit; }
+
+button { cursor: pointer; }
+
+a { color: inherit; }
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px clamp(22px, 5vw, 90px);
+  font-size: 12px;
+  letter-spacing: .09em;
+}
+
+header a { text-decoration: none; }
+
+main {
+  min-height: calc(100dvh - 86px);
+  padding: clamp(30px, 7vw, 110px)
+           clamp(22px, 11vw, 180px);
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #777;
+}
+
+.title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: clamp(55px, 10vw, 150px);
+  letter-spacing: -.065em;
+  line-height: .98;
+  margin: 30px 0 24px;
+}
+
+.sub {
+  color: #777;
+  font-size: 13px;
+}
+
+.works {
+  margin-top: clamp(55px, 9vw, 130px);
+  max-width: 850px;
+}
+
+.worklink {
+  width: 100%;
+  background: none;
+  border: 0;
+  border-top: 1px solid #ddd;
+  text-align: left;
+  display: flex;
+  align-items: baseline;
+  gap: 30px;
+  padding: 18px 0;
+  color: #111;
+}
+
+.worklink:last-child {
+  border-bottom: 1px solid #ddd;
+}
+
+.worklink:hover .workname {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.number {
+  font-size: 12px;
+  color: #888;
+  width: 28px;
+}
+
+.workname {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(25px, 3vw, 42px);
+}
+
+.screen {
+  min-height: calc(100dvh - 200px);
+  display: flex;
+  flex-direction: column;
+}
+
+.topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.back {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: 12px;
+  color: #666;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.stage {
+  flex: 1;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 0;
+}
+
+.center { max-width: 780px; }
+
+.statement {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: clamp(30px, 5vw, 66px);
+  line-height: 1.2;
+  letter-spacing: -.035em;
+}
+
+.smallnote {
+  font-size: 12px;
+  color: #777;
+  line-height: 1.7;
+}
+
+.quiet { color: #999; }
+
+.action {
+  background: transparent;
+  border: 1px solid #bbb;
+  padding: 12px 22px;
+  margin-top: 24px;
+  font-size: 12px;
+}
+
+.action:hover { border-color: #111; }
+
+textarea {
+  display: block;
+  width: min(600px, 80vw);
+  height: 170px;
+  border: 0;
+  border-bottom: 1px solid #aaa;
+  outline: none;
+  resize: vertical;
+  padding: 15px 0;
+  background: #fff;
+  font-family: Georgia, serif;
+  font-size: 25px;
+}
+
+textarea:focus { border-bottom-color: #111; }
+
+.hidden { display: none !important; }
+
+.about {
+  max-width: 620px;
+  line-height: 1.8;
+  font-size: 17px;
+}
+
+.aftercolor { color: #bc3b2d; }
+
+.response {
+  margin-top: 20px;
+  color: #777;
+  font-size: 12px;
+}
+
+.choices {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.choices button {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px 18px;
+  font-size: 12px;
+}
+
+@media (max-width: 550px) {
+  header { padding: 22px; }
+  main { padding: 55px 22px; }
+  .stage { padding: 40px 0; }
+  .title { font-size: 65px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="#" id="brand">THÉOPHANIE PARKER</a>
+  <a href="#about" id="aboutlink">ABOUT</a>
+</header>
+
+<main id="app"></main>
+
+<script>
+(() => {
+
+const app = document.querySelector('#app');
+
+let timeoutIds = [];
+let generation = 0;
+
+const works = [
+  'Remember This',
+  'One Question',
+  'You Were Here',
+  'Do Not Refresh',
+  'The Last Word',
+  'Afterimage',
+  'Unsent',
+  'No Second Look'
+];
+
+function clean() {
+  generation++;
+  timeoutIds.forEach(clearTimeout);
+  timeoutIds = [];
+}
+
+function later(fn, ms) {
+  const g = generation;
+  timeoutIds.push(setTimeout(() => {
+    if (g === generation) fn();
+  }, ms));
+}
+
+function el(id) {
+  return document.getElementById(id);
+}
+
+function seen(id) {
+  return sessionStorage.getItem('ntk-' + id) === '1';
+}
+
+function mark(id) {
+  sessionStorage.setItem('ntk-' + id, '1');
+}
+
+function navigate(where) {
+  location.hash = where ? ('#' + where) : '#';
+  render();
+}
+
+function index() {
+  app.innerHTML = `
+    <div class="eyebrow">Online exhibition · 2026</div>
+    <h1 class="title">Nothing<br>to Keep</h1>
+    <div class="sub">Eight browser-based works</div>
+
+    <nav class="works" aria-label="Exhibition works">
+      ${works.map((w, i) => `
+        <button class="worklink" data-work="${i}">
+          <span class="number">
+            ${String(i + 1).padStart(2, '0')}
+          </span>
+          <span class="workname">${w}</span>
+        </button>
+      `).join('')}
+    </nav>
+  `;
+
+  app.querySelectorAll('[data-work]').forEach(b => {
+    b.onclick = () => navigate('work-' + b.dataset.work);
+  });
+}
+
+function frame(i, content = '') {
+  app.innerHTML = `
+    <div class="screen">
+      <div class="topline">
+        <span class="eyebrow">
+          ${String(i + 1).padStart(2, '0')} / 08 — ${works[i]}
+        </span>
+        <button class="back" id="return">
+          Return to exhibition
+        </button>
+      </div>
+
+      <div class="stage">
+        <div class="center" id="content">${content}</div>
+      </div>
+    </div>
+  `;
+
+  el('return').onclick = () => navigate('');
+}
+
+function showOnce(i, html, ms) {
+  if (seen(i)) {
+    frame(i, '<p class="smallnote">This encounter has passed.</p>');
+    return;
+  }
+
+  mark(i);
+  frame(i, html);
+
+  later(() => {
+    if (el('content')) el('content').innerHTML = '';
+  }, ms);
+}
+
+function work(i) {
+  switch (i) {
+
+    // 01 — REMEMBER THIS
+    case 0:
+      showOnce(
+        i,
+        '<div class="statement" style="letter-spacing:.12em">K7M2Q9</div>',
+        5000
+      );
+      break;
+
+    // 02 — ONE QUESTION
+    case 1:
+      showOnce(
+        i,
+        '<div class="statement">What have you already forgotten today?</div>',
+        7000
+      );
+      break;
+
+    // 03 — YOU WERE HERE
+    case 2: {
+      if (seen(i)) {
+        frame(i, '<p class="smallnote">The moment has passed.</p>');
+        break;
+      }
+
+      mark(i);
+
+      const time = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+
+      frame(i, `<div class="statement">${time}</div>`);
+
+      later(() => {
+        if (el('content')) el('content').innerHTML = '';
+      }, 5000);
+
+      break;
+    }
+
+    // 04 — DO NOT REFRESH
+    case 3:
+      showOnce(
+        i,
+        '<div class="statement">This moment will not be repeated.</div>',
+        12000
+      );
+      break;
+
+    // 05 — THE LAST WORD
+    case 4: {
+      if (seen(i)) {
+        frame(i, '<p class="smallnote">The sentence has passed.</p>');
+        break;
+      }
+
+      mark(i);
+
+      frame(
+        i,
+        '<div class="statement" id="words" aria-live="polite"></div>'
+      );
+
+      const words = [
+        'Some', 'things', 'are', 'only',
+        'ours', 'for', 'a', 'moment.'
+      ];
+
+      words.forEach((word, n) => {
+        later(() => {
+          if (el('words')) {
+            el('words').textContent =
+              words.slice(0, n + 1).join(' ');
+          }
+        }, n * 650);
+      });
+
+      later(() => {
+        if (el('content')) el('content').innerHTML = '';
+      }, words.length * 650 + 1600);
+
+      break;
+    }
+
+    // 06 — AFTERIMAGE
+    case 5: {
+      if (seen(i)) {
+        frame(
+          i,
+          '<p class="smallnote">The colour is no longer available.</p>'
+        );
+        break;
+      }
+
+      mark(i);
+
+      frame(i, '<div class="statement aftercolor">ALMOST</div>');
+
+      later(() => {
+        el('content').innerHTML = `
+          <div class="statement">
+            What colour do you remember?
+          </div>
+
+          <div class="choices">
+            <button data-color="Red">Red</button>
+            <button data-color="Blue">Blue</button>
+            <button data-color="Green">Green</button>
+            <button data-color="Yellow">Yellow</button>
+          </div>
+
+          <div class="response" id="response"></div>
+        `;
+
+        app.querySelectorAll('[data-color]').forEach(b => {
+          b.onclick = () => {
+            app.querySelectorAll('[data-color]').forEach(x => {
+              x.disabled = true;
+            });
+
+            el('response').textContent =
+              'Your answer was not recorded.';
+          };
+        });
+      }, 3000);
+
+      break;
+    }
+
+    // 07 — UNSENT
+    case 6: {
+      frame(i, `
+        <textarea
+          id="unsent"
+          aria-label="Write something"
+          placeholder="Write something here."
+        ></textarea>
+
+        <button class="action" id="erase">Erase</button>
+
+        <div class="response" id="response"></div>
+      `);
+
+      el('erase').onclick = () => {
+        el('unsent').value = '';
+        el('unsent').remove();
+        el('erase').remove();
+
+        el('response').textContent =
+          'Nothing was sent or saved.';
+      };
+
+      break;
+    }
+
+    // 08 — NO SECOND LOOK
+    case 7: {
+      if (seen(i)) {
+        frame(
+          i,
+          '<p class="smallnote">There is no second look.</p>'
+        );
+        break;
+      }
+
+      frame(
+        i,
+        '<button class="action" id="reveal">Reveal statement</button>'
+      );
+
+      el('reveal').onclick = () => {
+        mark(i);
+
+        el('content').innerHTML = `
+          <div class="statement">
+            You cannot stand in the same moment twice.
+          </div>
+
+          <button class="action" id="close">Close</button>
+        `;
+
+        el('close').onclick = () => {
+          el('content').innerHTML =
+            '<p class="smallnote">There is no second look.</p>';
+        };
+      };
+
+      break;
+    }
+  }
+}
+
+function about() {
+  app.innerHTML = `
+    <div class="eyebrow">About</div>
+
+    <h1 class="title">Théophanie<br>Parker</h1>
+
+    <div class="about">
+      <p>
+        Théophanie Parker is a visual artist working across
+        documentary photography, film, textiles and digital media.
+        Her practice explores human experience, social relationships,
+        identity, memory and the systems through which meaning
+        is created and communicated.
+      </p>
+
+      <p>
+        Her work draws on documentary methods, cultural research,
+        visual storytelling, cryptography, steganography and
+        computational processes, combining traditional artistic
+        media with contemporary technologies.
+      </p>
+
+      <p>
+        <button class="back" id="return">
+          Return to exhibition
+        </button>
+      </p>
+    </div>
+  `;
+
+  el('return').onclick = () => navigate('');
+}
+
+function render() {
+  clean();
+
+  const hash = location.hash.slice(1);
+
+  if (hash === 'about') {
+    about();
+  } else if (/^work-[0-7]$/.test(hash)) {
+    work(Number(hash.slice(-1)));
+  } else {
+    index();
+  }
+}
+
+window.addEventListener('hashchange', render);
+
+document.getElementById('brand').onclick = e => {
+  e.preventDefault();
+  navigate('');
+};
+
+render();
+
+})();
+</script>
+
+</body>
+</html>
+
